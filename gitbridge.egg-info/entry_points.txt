@@ -1,0 +1,2 @@
+[console_scripts]
+gitbridge = gitbridge.cli_app:main

@@ -1,0 +1,17 @@
+README.md
+setup.py
+gitbridge/__init__.py
+gitbridge/__main__.py
+gitbridge/cli.py
+gitbridge/cli_app.py
+gitbridge/commands.py
+gitbridge/config.py
+gitbridge/config_manager.py
+gitbridge/git_operations.py
+gitbridge/github_api.py
+gitbridge/simple_cli.py
+gitbridge.egg-info/PKG-INFO
+gitbridge.egg-info/SOURCES.txt
+gitbridge.egg-info/dependency_links.txt
+gitbridge.egg-info/entry_points.txt
+gitbridge.egg-info/top_level.txt
