@@ -7,22 +7,21 @@ GitBridge is a tool for managing multiple Git repositories across different acco
 1. [Installation](#installation)
 2. [Configuration](#configuration)
 3. [Commands](#commands)
-4. [Use Cases](#use-cases)
-5. [Troubleshooting](#troubleshooting)
+4. [Architecture](#architecture)
+5. [Use Cases](#use-cases)
+6. [Troubleshooting](#troubleshooting)
 
 ## Installation
 
-GitBridge is a Python-based tool that requires minimal dependencies. You can run it directly from the source code:
+GitBridge is a Python-based tool that requires no external dependencies. You can install it directly from the source code:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/GitBridge.git
+git clone https://github.com/ukoquique/GitBridge.git
 cd GitBridge
 
-# Optional: Create a virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install in development mode
+pip install -e .
 ```
 
 ## Configuration
@@ -75,12 +74,12 @@ GitBridge supports the following commands:
 Add a new GitHub account with a personal access token:
 
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py add-account <ACCOUNT_NAME> <TOKEN>
+gitbridge add-account <ACCOUNT_NAME> <TOKEN>
 ```
 
 Example:
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py add-account github_personal YOUR_GITHUB_TOKEN
+gitbridge add-account github_personal YOUR_GITHUB_TOKEN
 ```
 
 ### List Repositories
@@ -88,7 +87,7 @@ python /path/to/GitBridge/gitbridge/simple_cli.py add-account github_personal YO
 List all repositories from all configured accounts:
 
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py list-repos
+gitbridge list-repos
 ```
 
 This will display all repositories for each account in your configuration.
@@ -98,12 +97,12 @@ This will display all repositories for each account in your configuration.
 Copy a repository from one account to another:
 
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py copy-repo <OWNER/REPO> --source <SOURCE_ACCOUNT> --dest <DEST_ACCOUNT> [--branch <BRANCH>]
+gitbridge copy-repo <OWNER/REPO> --source <SOURCE_ACCOUNT> --dest <DEST_ACCOUNT> [--branch <BRANCH>]
 ```
 
 Example:
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py copy-repo HectorCorbellini/lovableTranslator --source HectorCorbellini --dest ukoquique
+gitbridge copy-repo HectorCorbellini/lovableTranslator --source HectorCorbellini --dest ukoquique
 ```
 
 This will:
@@ -117,7 +116,7 @@ This will:
 Delete a repository from an account:
 
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py delete-repo <OWNER/REPO> --account <ACCOUNT_NAME> [--force] [--yes]
+gitbridge delete-repo <OWNER/REPO> --account <ACCOUNT_NAME> [--force] [--yes]
 ```
 
 Options:
@@ -126,7 +125,7 @@ Options:
 
 Example:
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py delete-repo HectorCorbellini/old-project --account HectorCorbellini
+gitbridge delete-repo HectorCorbellini/old-project --account HectorCorbellini
 ```
 
 This will permanently delete the repository after confirmation.
@@ -136,12 +135,12 @@ This will permanently delete the repository after confirmation.
 Move a repository from one account to another (copy + delete):
 
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py move-repo <OWNER/REPO> --source <SOURCE_ACCOUNT> --dest <DEST_ACCOUNT> [--branch <BRANCH>]
+gitbridge move-repo <OWNER/REPO> --source <SOURCE_ACCOUNT> --dest <DEST_ACCOUNT> [--branch <BRANCH>]
 ```
 
 Example:
 ```bash
-python /path/to/GitBridge/gitbridge/simple_cli.py move-repo HectorCorbellini/portfolio-vercel --source HectorCorbellini --dest ukoquique
+gitbridge move-repo HectorCorbellini/portfolio-vercel --source HectorCorbellini --dest ukoquique
 ```
 
 This will:
@@ -149,6 +148,39 @@ This will:
 2. Delete the repository from the source account
 
 If the copy succeeds but the deletion fails, a warning will be displayed.
+
+## Architecture
+
+GitBridge follows clean code principles with a modular architecture designed for maintainability, testability, and extensibility.
+
+### Core Components
+
+- **config_manager.py**: Handles loading, saving, and managing configuration
+  - `ConfigManager`: Manages account tokens and configuration settings
+
+- **github_api.py**: Provides a clean interface to GitHub API
+  - `GitHubClient`: Handles API requests to GitHub
+  - Helper functions for parsing repository paths
+
+- **git_operations.py**: Handles Git operations
+  - `GitOperations`: Low-level Git command execution
+  - `GitRepoSync`: High-level repository synchronization
+
+- **commands.py**: Implements command business logic
+  - Command handler classes for each operation
+  - Separation of concerns between CLI and business logic
+
+- **cli_app.py**: Command-line interface
+  - Argument parsing and command routing
+  - User-friendly error handling
+
+### Design Principles
+
+1. **Single Responsibility Principle**: Each module and class has a single responsibility
+2. **Dependency Inversion**: High-level modules don't depend on low-level modules
+3. **Error Handling**: Consistent error handling throughout the codebase
+4. **Testability**: Components are designed to be easily testable
+5. **No External Dependencies**: Uses only standard Python libraries
 
 ## Use Cases
 
