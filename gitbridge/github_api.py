@@ -50,6 +50,17 @@ class GitHubClient:
         """Get authenticated user information."""
         args = ['curl', '-s', *self.base_headers, 'https://api.github.com/user']
         return self._execute_request(args)
+        
+    def get_username(self) -> Tuple[bool, str]:
+        """Get the username associated with this token.
+        
+        Returns:
+            Tuple of (success, username)
+        """
+        success, user_data = self.get_user()
+        if success and isinstance(user_data, dict) and 'login' in user_data:
+            return True, user_data['login']
+        return False, ""
     
     def list_repositories(self) -> Tuple[bool, List[Dict[str, Any]]]:
         """List repositories for the authenticated user."""
@@ -91,18 +102,40 @@ class GitHubClient:
         Args:
             repo_path: Repository path in format "owner/repo"
         """
+        # Use -f to treat HTTP errors (4xx/5xx) as curl failures
         args = [
-            'curl', '-s', '-X', 'DELETE',
+            'curl', '-s', '-f', '-X', 'DELETE',
             *self.base_headers,
             f'https://api.github.com/repos/{repo_path}'
         ]
-        
-        return self._execute_request(args)
+        # Execute delete and provide token permission suggestion on failure
+        success, data = self._execute_request(args)
+        if not success:
+            err_msg = data if isinstance(data, str) else ''
+            return False, f"{err_msg}. Check the token permissions."
+        return True, data
     
     def repository_exists(self, repo_path: str) -> bool:
         """Check if a repository exists and is accessible."""
-        success, _ = self.get_repository(repo_path)
-        return success
+        success, data = self.get_repository(repo_path)
+        # If the request failed, repository doesn't exist or inaccessible
+        if not success:
+            return False
+        # GitHub returns JSON {'message':'Not Found',...} on 404, so check message
+        if isinstance(data, dict) and data.get('message', '').lower().startswith('not found'):
+            return False
+        return True
+    
+    def list_repository_contents(self, repo_path: str, path: str = "") -> Tuple[bool, Any]:
+        """
+        List contents of a repository at given path.
+        """
+        if path:
+            url = f"https://api.github.com/repos/{repo_path}/contents/{path}"
+        else:
+            url = f"https://api.github.com/repos/{repo_path}/contents"
+        args = ['curl', '-s', *self.base_headers, url]
+        return self._execute_request(args)
 
 
 def parse_repository_path(repo_path: str, default_owner: Optional[str] = None) -> Tuple[str, str]:

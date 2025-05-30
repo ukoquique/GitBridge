@@ -1,15 +1,16 @@
 # GitBridge Manual
 
-GitBridge is a tool for managing multiple Git repositories across different accounts and services. It helps you synchronize, organize, and manage repositories between GitHub accounts.
+GitBridge is a tool for managing multiple Git repositories across different accounts and services. It helps you synchronize, organize, and manage repositories between GitHub accounts. It provides both a command-line interface and a graphical user interface for ease of use.
 
 ## Table of Contents
 
 1. [Installation](#installation)
 2. [Configuration](#configuration)
-3. [Commands](#commands)
-4. [Architecture](#architecture)
-5. [Use Cases](#use-cases)
-6. [Troubleshooting](#troubleshooting)
+3. [Command-Line Interface](#command-line-interface)
+4. [Graphical User Interface](#graphical-user-interface)
+5. [Architecture](#architecture)
+6. [Use Cases](#use-cases)
+7. [Troubleshooting](#troubleshooting)
 
 ## Installation
 
@@ -65,7 +66,7 @@ To create a GitHub personal access token:
 4. Generate the token and copy it
 5. Add it to GitBridge using the commands above
 
-## Commands
+## Command-Line Interface
 
 GitBridge supports the following commands:
 
@@ -149,6 +150,86 @@ This will:
 
 If the copy succeeds but the deletion fails, a warning will be displayed.
 
+## Graphical User Interface
+
+GitBridge provides a user-friendly graphical interface for all operations. You can launch it with:
+
+```bash
+python -m gitbridge.gui_app
+```
+
+### Standalone Launcher
+
+For easier access, GitBridge now includes a standalone launcher script. You can run the application using any of these methods:
+
+```bash
+# Method 1: Run the launcher directly (recommended)
+./gitbridge_app.py
+
+# Method 2: Run the launcher with Python
+python3 gitbridge_app.py
+
+# Method 3: Original module method
+python3 -m gitbridge.gui_app
+```
+
+The standalone launcher provides these benefits:
+- Simpler to use and remember
+- Can be added to desktop shortcuts or application menus
+- Includes proper error handling
+- Works from any directory (when installed properly)
+
+### GUI Features
+
+#### Add Account Tab
+
+Allows you to add new GitHub accounts and manage existing ones:
+
+- Add new accounts with name and token
+- View all existing accounts with masked tokens for security
+- Delete accounts with a single click
+- Automatic duplicate account detection (prevents adding the same GitHub account twice)
+
+#### List Repos Tab
+
+Displays all repositories across your accounts:
+
+- Shows repositories grouped by account
+- Includes repository full names
+- Refresh button to update the list
+
+#### Copy Repo Tab
+
+Copy repositories between accounts:
+
+- Select source and destination accounts from dropdowns
+- Specify repository name and branch
+- Handles repository creation in the destination account
+
+#### Delete Repo Tab
+
+Delete repositories from an account:
+
+- Select account from dropdown
+- Enter repository name
+- Confirmation dialog to prevent accidental deletion
+
+#### Move Repo Tab
+
+Move repositories from one account to another:
+
+- Select source and destination accounts
+- Enter repository name
+- Performs copy followed by delete
+
+#### View Repo Tab
+
+Browse repository contents:
+
+- Select account and repository from dropdowns
+- View files and folders in the repository
+- Refresh to update the view
+
 ## Architecture
 
 GitBridge follows clean code principles with a modular architecture designed for maintainability, testability, and extensibility.
@@ -173,6 +254,11 @@ GitBridge follows clean code principles with a modular architecture designed for
 - **cli_app.py**: Command-line interface
   - Argument parsing and command routing
   - User-friendly error handling
+  
+- **gui_app.py**: Graphical user interface
+  - Tkinter-based UI with tabs for different operations
+  - Event-driven architecture
+  - Reuses the same business logic as the CLI
 
 ### Design Principles
 
@@ -181,6 +267,8 @@ GitBridge follows clean code principles with a modular architecture designed for
 3. **Error Handling**: Consistent error handling throughout the codebase
 4. **Testability**: Components are designed to be easily testable
 5. **No External Dependencies**: Uses only standard Python libraries
+6. **Code Reuse**: Both CLI and GUI use the same underlying business logic
+7. **User Experience**: Intuitive interfaces for both command-line and graphical users
 
 ## Use Cases
 

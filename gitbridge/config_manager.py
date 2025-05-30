@@ -5,7 +5,7 @@ Handles loading, saving, and managing configuration.
 import os
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 
 class ConfigManager:
@@ -84,6 +84,35 @@ class ConfigManager:
             
         self.data['accounts'][name] = token
         return self.save()
+        
+    def account_exists_by_username(self, token: str) -> Tuple[bool, str]:
+        """
+        Check if an account with the same GitHub username already exists.
+        
+        Args:
+            token: Personal access token to check
+            
+        Returns:
+            Tuple of (exists, existing_account_name)
+        """
+        from gitbridge.github_api import GitHubClient
+        
+        # Get the username for the new token
+        client = GitHubClient(token)
+        success, username = client.get_username()
+        
+        if not success or not username:
+            return False, ""
+            
+        # Check if any existing account has the same username
+        for account_name, account_token in self.get_accounts().items():
+            existing_client = GitHubClient(account_token)
+            existing_success, existing_username = existing_client.get_username()
+            
+            if existing_success and existing_username == username:
+                return True, account_name
+                
+        return False, ""
     
     def remove_account(self, name: str) -> bool:
         """
